@@ -1,10 +1,16 @@
 import Success from "../domain/Success";
 import { User, UserToGet, UserToCreate } from "../domain/User";
+import Token from "../domain/token";
 import logger from "../misc/logger";
 import UserModel from "../models/userModel";
 import bcrypt from "bcrypt";
 import { SALT_LENGTH } from "../constants/common";
+import jwt from "jsonwebtoken";
+import dotent from "dotenv";
 
+dotent.config({
+  path: __dirname + "/../../.env",
+});
 /**
  * Get all users
  * @returns promise
@@ -102,4 +108,83 @@ export const deleteUser = async (user_id: number): Promise<String> => {
 
     return "Error deleting user";
   }
+};
+
+/**
+ * Get user by email
+ * @param { string } email
+ * @returns
+ */
+export const getUserByEmail = async (email: string): Promise<Success<User>> => {
+  logger.info("Getting user by email");
+  try {
+    const user = await UserModel.getUserByEmail(email);
+
+    return {
+      data: user,
+      message: "User fetched successfully",
+    };
+  } catch (err) {
+    logger.info(err);
+
+    return {
+      message: "Error fetching user",
+    };
+  }
+};
+
+/**
+ * Get user by Id
+ * @param {number}
+ * @returns {Promise}
+ */
+export const getUserById = async (
+  user_id: number
+): Promise<Success<UserToGet>> => {
+  logger.info("Getting user by id");
+  try {
+    const user = await UserModel.getUserById(user_id);
+
+    return {
+      data: user,
+      message: "User fetched successfully",
+    };
+  } catch (err) {
+    logger.info(err);
+
+    return {
+      message: "Error fetching user",
+    };
+  }
+};
+
+export const loginUser = async (
+  email: string,
+  password: string
+): Promise<Success<Token>> => {
+  logger.info("Logging in");
+  const user = await UserModel.getUserByEmail(email);
+
+  if (!user) {
+    return {
+      message: "User not Found",
+    };
+  }
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
+  if (!isPasswordMatched) {
+    return {
+      message: "Password doesn't match",
+    };
+  }
+
+  //user is authenticated
+  const accessToken = jwt.sign(
+    { user_id: user.user_id },
+    process.env.JWT_SECRET as string
+  );
+
+  return {
+    data: { accessToken },
+    message: "User logged Successfully",
+  };
 };

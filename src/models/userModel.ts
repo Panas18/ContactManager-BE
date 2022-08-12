@@ -5,15 +5,13 @@ class UserAccount {
   public static table = "user_account";
 
   /**
-   * return id and email of all users
+   * return id, email, firstname and lastname of all users
    * @return promise
    */
   public static async getAllUsers(): Promise<UserToGet[]> {
     const users: UserToGet[] = await db(UserAccount.table).select(
       "user_id",
-      "email",
-      "first_name",
-      "last_name"
+      "email"
     );
 
     return users;
@@ -47,6 +45,36 @@ class UserAccount {
     return updatedUser;
   }
 
+  /**
+   *  Get User by email
+   * @param { string } email
+   * @returns
+   */
+  public static async getUserByEmail(email: String) {
+    const user = await db(UserAccount.table).where({ email: email }).first();
+
+    return user;
+  }
+
+  /**
+   * Get user by Id
+   * @param {number}
+   * @returns {Promise}
+   */
+  public static async getUserById(user_id: number) {
+    const user = await db(UserAccount.table)
+      .where({ user_id: user_id })
+      .first()
+      .returning(["user_id", "first_name", "last_name", "email"]);
+
+    return user;
+  }
+
+  /**
+   *  Delete user
+   * @param {number}
+   * @returns{ string }
+   */
   public static async deleteUser(user_id: number): Promise<String> {
     await db(UserAccount.table).where({ user_id: user_id }).delete();
     return "User Deleted Successfully";

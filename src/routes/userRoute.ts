@@ -4,7 +4,9 @@ import * as userController from "../controller/userController";
 const router = Router();
 
 router.get("/", userController.getAllUsers);
-router.put("/:userId", userController.updateUser);
-router.delete("/:userId", userController.deleteUser);
+router.put("/:user_id", userController.updateUser);
+router.delete("/:user_id", userController.deleteUser);
+router.post("/email", userController.getUserByEmail);
+router.get("/:user_id", userController.getUserById);
 
 export default router;
