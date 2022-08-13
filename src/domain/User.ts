@@ -7,9 +7,9 @@ export interface User {
   password: string;
 }
 
-export type UserToCreate = Omit<User, "id">;
+export type UserToCreate = Omit<User, "user_id">;
 export interface UserToGet {
-  id: number;
+  user_id: number;
   email: string;
   first_name?: string;
   last_name?: string;
