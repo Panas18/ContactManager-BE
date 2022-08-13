@@ -1,6 +1,6 @@
 import Success from "../domain/Success";
 import { User, UserToGet, UserToCreate } from "../domain/User";
-import Token from "../domain/token";
+import Token from "../domain/Token";
 import logger from "../misc/logger";
 import UserModel from "../models/userModel";
 import bcrypt from "bcrypt";
