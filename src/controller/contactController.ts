@@ -33,7 +33,10 @@ export const addContact = (
   next: NextFunction
 ) => {
   const user_account_id = req.authUser;
+  const photo = req.file?.path + "";
+
   const contact = req.body;
+  contact.photo = photo;
 
   contactService
     .addContact({ ...contact, user_account_id })

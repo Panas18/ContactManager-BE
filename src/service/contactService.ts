@@ -2,6 +2,8 @@ import Success from "../domain/Success";
 import { Contact, ContactToCreate } from "../domain/Contact";
 import contactModel from "../models/contactModel";
 import logger from "../misc/logger";
+import fs from "fs";
+import cloudinary from "../misc/coludinary";
 
 /**
  * Get all contact of authorized user
@@ -37,9 +39,21 @@ export const getAllContacts = async (
 export const addContact = async (
   contact: ContactToCreate
 ): Promise<Success<Contact>> => {
-  logger.info("Creating a new Contact");
-
   try {
+    logger.info("Creating a new Contact");
+
+    if (!fs.existsSync(contact.photo)) {
+      throw new Error("File not found");
+    }
+    const cloudResponse = await cloudinary.uploader.upload(contact.photo, {
+      upload_preset: "contact-manager",
+    });
+
+    const url = cloudResponse.url;
+
+    fs.unlinkSync(contact.photo);
+
+    contact.photo = url;
     const newContact = await contactModel.addContact(contact);
 
     return {
@@ -48,9 +62,9 @@ export const addContact = async (
     };
   } catch (err) {
     logger.info(err);
-
+    fs.unlinkSync(contact.photo);
     return {
-      message: "Error adding contact",
+      message: "error adding contact",
     };
   }
 };
