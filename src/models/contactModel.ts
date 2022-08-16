@@ -25,6 +25,8 @@ class ContactTable {
    * @returns { Promise<Contact> }
    */
   public static async addContact(contact: ContactToCreate): Promise<Contact> {
+    console.log(contact);
+
     const newContact: Contact = await db(ContactTable.table)
       .where({ user_account_id: contact.user_account_id })
       .insert(contact, ["id", "first_name", "last_name", "user_account_id"]);

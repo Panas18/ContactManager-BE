@@ -10,6 +10,7 @@ export interface Contact {
   company?: string;
   is_favourite?: string;
   user_account_id: number;
+  photo?: any;
 }
 
 export type ContactToCreate = Omit<Contact, "id">;
