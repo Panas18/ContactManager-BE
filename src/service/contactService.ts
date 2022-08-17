@@ -98,7 +98,6 @@ export const updateContact = async (
 
       contact.photo = url;
     }
-
     const updatedContact = await contactModel.updateContact(
       user_id,
       contact_id,
@@ -118,6 +117,12 @@ export const updateContact = async (
   }
 };
 
+/**
+ *  delete contact
+ * @param user_id
+ * @param contact_id
+ * @returns
+ */
 export const deleteContact = async (
   user_id: number,
   contact_id: number
@@ -138,6 +143,12 @@ export const deleteContact = async (
   }
 };
 
+/**
+ *  get contact by id
+ * @param user_id
+ * @param contact_id
+ * @returns
+ */
 export const getContactById = async (
   user_id: number,
   contact_id: number
