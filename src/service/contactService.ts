@@ -4,6 +4,7 @@ import contactModel from "../models/contactModel";
 import logger from "../misc/logger";
 import fs from "fs";
 import cloudinary from "../misc/coludinary";
+import { DEFAULT_PROFILE_URL } from "../constants/common";
 
 /**
  * Get all contact of authorized user
@@ -41,17 +42,17 @@ export const addContact = async (
 ): Promise<Success<Contact>> => {
   try {
     logger.info("Creating a new Contact");
-
+    let url = "";
     if (!fs.existsSync(contact.photo)) {
-      throw new Error("File not found");
+      url = DEFAULT_PROFILE_URL;
+    } else {
+      const cloudResponse = await cloudinary.uploader.upload(contact.photo, {
+        upload_preset: "contact-manager",
+      });
+
+      url = cloudResponse.url;
+      fs.unlinkSync(contact.photo);
     }
-    const cloudResponse = await cloudinary.uploader.upload(contact.photo, {
-      upload_preset: "contact-manager",
-    });
-
-    const url = cloudResponse.url;
-
-    fs.unlinkSync(contact.photo);
 
     contact.photo = url;
     const newContact = await contactModel.addContact(contact);
@@ -65,6 +66,54 @@ export const addContact = async (
     fs.unlinkSync(contact.photo);
     return {
       message: "error adding contact",
+    };
+  }
+};
+
+/**
+ * Update Contact
+ * @param user_id
+ * @param contact_id
+ * @param contact
+ * @returns
+ */
+export const updateContact = async (
+  user_id: number,
+  contact_id: number,
+  contact: Contact
+): Promise<Success<Contact>> => {
+  logger.info("Updating Contact");
+
+  try {
+    if (!fs.existsSync(contact.photo)) {
+      delete contact.photo;
+    } else {
+      const cloudResponse = await cloudinary.uploader.upload(contact.photo, {
+        upload_preset: "contact-manager",
+      });
+
+      const url = cloudResponse.url;
+
+      fs.unlinkSync(contact.photo);
+
+      contact.photo = url;
+    }
+
+    const updatedContact = await contactModel.updateContact(
+      user_id,
+      contact_id,
+      contact
+    );
+
+    return {
+      data: updatedContact,
+      message: "Contact Updated successfully",
+    };
+  } catch (err) {
+    logger.info(err);
+
+    return {
+      message: "Error updating contact",
     };
   }
 };
@@ -107,33 +156,6 @@ export const getContactById = async (
 
     return {
       message: "Failed to fatch contact",
-    };
-  }
-};
-
-export const updateContact = async (
-  user_id: number,
-  contact_id: number,
-  contact: Contact
-): Promise<Success<Contact>> => {
-  logger.info("Updating Contact");
-
-  try {
-    const updatedContact = await contactModel.updateContact(
-      user_id,
-      contact_id,
-      contact
-    );
-
-    return {
-      data: updatedContact,
-      message: "Contact Updated successfully",
-    };
-  } catch (err) {
-    logger.info(err);
-
-    return {
-      message: "Error updating contact",
     };
   }
 };

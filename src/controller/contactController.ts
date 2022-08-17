@@ -44,6 +44,35 @@ export const addContact = (
     .catch((err) => next(err));
 };
 
+/**
+ * Update contact
+ * @param req
+ * @param res
+ * @param next
+ */
+export const updateContact = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const user_id = req.authUser;
+  const contact_id = req.params.contact_id;
+  const contact = req.body;
+  const photo = req.file?.path + "";
+  contact.photo = photo;
+
+  contactService
+    .updateContact(user_id as number, +contact_id, contact)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+};
+
+/**
+ *  Delete contact
+ * @param req
+ * @param res
+ * @param next
+ */
 export const deleteContact = (
   req: AuthRequest,
   res: Response,
@@ -72,20 +101,6 @@ export const getContactById = (
   const contact_id = req.params.contact_id;
   contactService
     .getContactById(user_id as number, +contact_id)
-    .then((data) => res.json(data))
-    .catch((err) => next(err));
-};
-
-export const updateContact = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const user_id = req.authUser;
-  const contact_id = req.params.contact_id;
-  const contact = req.body;
-  contactService
-    .updateContact(user_id as number, +contact_id, contact)
     .then((data) => res.json(data))
     .catch((err) => next(err));
 };
