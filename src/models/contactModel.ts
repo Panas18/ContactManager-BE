@@ -37,7 +37,7 @@ class ContactTable {
   public static async updateContact(
     user_id: number,
     contact_id: number,
-    contact: Contact
+    contact: ContactToCreate
   ): Promise<Contact> {
     const updatedContact: Contact = await db(ContactTable.table)
       .where({ user_account_id: user_id })
